@@ -1,0 +1,94 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../utils/Toast';
+import { getBrandName, getAdminEmail } from '../utils/helpers';
+import '../components/admin/Admin.css';
+
+const AdminLogin: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const { addToast } = useToast();
+  const brandName = getBrandName();
+  const adminEmail = getAdminEmail();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      if (login(email, password)) {
+        addToast('Login successful!', 'success');
+        navigate('/admin/dashboard');
+      } else {
+        addToast('Invalid email or password', 'error');
+      }
+      setIsLoading(false);
+    }, 500);
+  };
+
+  return (
+    <div className="admin-login-page">
+      <div className="login-container">
+        <div className="login-card">
+          <h1>Admin Dashboard</h1>
+          <p className="login-subtitle">Manage your {brandName} products and categories</p>
+
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="email">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={adminEmail}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <div className="login-info">
+              <p><strong>Demo Credentials:</strong></p>
+              <p>Email: {adminEmail}</p>
+              <p>Password: admin123</p>
+            </div>
+
+            <button type="submit" className="btn btn-primary btn-lg" disabled={isLoading} style={{ width: '100%' }}>
+              {isLoading ? 'Logging in...' : 'Login to Dashboard'}
+            </button>
+          </form>
+        </div>
+
+        <div className="login-sidebar">
+          <h2>Admin Features</h2>
+          <ul>
+            <li>📦 Manage Products</li>
+            <li>🏷️ Manage Categories</li>
+            <li>📊 View Dashboard Analytics</li>
+            <li>🔍 Monitor Recent Products</li>
+            <li>✏️ Edit Product Details</li>
+            <li>🗑️ Delete Products</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminLogin;
