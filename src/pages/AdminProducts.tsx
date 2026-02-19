@@ -15,10 +15,14 @@ const AdminProducts: React.FC = () => {
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDelete = (id: string, name: string) => {
+  const handleDelete = async (id: string, name: string) => {
     if (window.confirm(`Delete "${name}"? This action cannot be undone.`)) {
-      deleteProduct(id);
-      addToast(`${name} deleted successfully`, 'success');
+      try {
+        await deleteProduct(id);
+        addToast(`${name} deleted successfully`, 'success');
+      } catch (error) {
+        addToast('Failed to delete product', 'error');
+      }
     }
   };
 

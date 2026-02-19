@@ -31,7 +31,7 @@ const AdminCategories: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name.trim()) {
@@ -46,10 +46,10 @@ const AdminCategories: React.FC = () => {
 
     try {
       if (editingId) {
-        updateCategory(editingId, formData);
+        await updateCategory(editingId, formData);
         addToast(`${formData.name} updated successfully!`, 'success');
       } else {
-        addCategory(formData);
+        await addCategory(formData);
         addToast(`${formData.name} added successfully!`, 'success');
       }
       setIsAddingNew(false);
@@ -60,7 +60,7 @@ const AdminCategories: React.FC = () => {
     }
   };
 
-  const handleDelete = (id: string, name: string) => {
+  const handleDelete = async (id: string, name: string) => {
     const productCount = products.filter((p) => p.category_id === id).length;
     
     if (productCount > 0) {
@@ -72,8 +72,12 @@ const AdminCategories: React.FC = () => {
     }
 
     if (window.confirm(`Delete "${name}"? This action cannot be undone.`)) {
-      deleteCategory(id);
-      addToast(`${name} deleted successfully`, 'success');
+      try {
+        await deleteCategory(id);
+        addToast(`${name} deleted successfully`, 'success');
+      } catch (error) {
+        addToast('Failed to delete category', 'error');
+      }
     }
   };
 

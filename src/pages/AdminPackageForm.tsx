@@ -38,7 +38,7 @@ const AdminPackageForm: React.FC = () => {
     }
   }, [existingPackage]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.tracking_id.trim()) {
@@ -56,15 +56,18 @@ const AdminPackageForm: React.FC = () => {
       return;
     }
 
-    if (isEditMode && id) {
-      updatePackage(id, formData);
-      addToast(`Package ${formData.tracking_id} updated successfully`, 'success');
-    } else {
-      addPackage(formData);
-      addToast(`Package ${formData.tracking_id} created successfully`, 'success');
+    try {
+      if (isEditMode && id) {
+        await updatePackage(id, formData);
+        addToast(`Package ${formData.tracking_id} updated successfully`, 'success');
+      } else {
+        await addPackage(formData);
+        addToast(`Package ${formData.tracking_id} created successfully`, 'success');
+      }
+      navigate('/admin/packages');
+    } catch (error) {
+      addToast('An error occurred', 'error');
     }
-
-    navigate('/admin/packages');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

@@ -67,18 +67,15 @@ const AdminProductForm: React.FC = () => {
         return;
       }
 
-      // Simulate API call
-      setTimeout(() => {
-        if (isEdit && product) {
-          updateProduct(product.id, formData);
+      if (isEdit && product) {
+          await updateProduct(product.id, formData);
           addToast(`${formData.name} updated successfully!`, 'success');
         } else {
-          addProduct(formData);
+          await addProduct(formData);
           addToast(`${formData.name} added successfully!`, 'success');
         }
         navigate('/admin/products');
         setIsSubmitting(false);
-      }, 500);
     } catch (error) {
       addToast('An error occurred', 'error');
       setIsSubmitting(false);

@@ -16,10 +16,14 @@ const AdminPackages: React.FC = () => {
     pkg.current_location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDelete = (id: string, trackingId: string) => {
+  const handleDelete = async (id: string, trackingId: string) => {
     if (window.confirm(`Delete package "${trackingId}"? This action cannot be undone.`)) {
-      deletePackage(id);
-      addToast(`Package ${trackingId} deleted successfully`, 'success');
+      try {
+        await deletePackage(id);
+        addToast(`Package ${trackingId} deleted successfully`, 'success');
+      } catch (error) {
+        addToast('Failed to delete package', 'error');
+      }
     }
   };
 
