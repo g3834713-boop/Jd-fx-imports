@@ -12,6 +12,7 @@ export interface Product {
   created_at: string;
   status?: 'in_stock' | 'preorder';
   estimated_delivery?: string;
+  stock?: number;
 }
 
 export interface Category {
@@ -65,6 +66,7 @@ const mapProduct = (p: any): Product => ({
   created_at: p.createdAt ?? p.created_at ?? new Date().toISOString(),
   status: p.status ?? 'in_stock',
   estimated_delivery: p.estimatedDelivery ?? p.estimated_delivery,
+  stock: p.stock ?? 0,
 });
 
 const mapCategory = (c: any): Category => ({

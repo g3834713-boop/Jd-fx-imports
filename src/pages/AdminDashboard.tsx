@@ -7,7 +7,7 @@ import '../components/admin/Admin.css';
 const AdminDashboard: React.FC = () => {
   const { products, categories } = useData();
   const recentProducts = products.slice(0, 5);
-  const totalValue = products.reduce((sum, p) => sum + (p.price_estimate * 10), 0); // Assuming 10 units average
+  const totalValue = products.reduce((sum, p) => sum + (p.price_estimate * (p.stock ?? 0)), 0);
 
   return (
     <div className="admin-dashboard">
