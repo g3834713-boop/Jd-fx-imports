@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { productsAPI, categoriesAPI, packagesAPI } from '../utils/api';
 
 export interface Product {
   id: string;
@@ -36,234 +37,184 @@ interface DataContextType {
   products: Product[];
   categories: Category[];
   packages: Package[];
-  addProduct: (product: Omit<Product, 'id' | 'created_at'>) => void;
-  updateProduct: (id: string, product: Partial<Product>) => void;
-  deleteProduct: (id: string) => void;
-  addCategory: (category: Omit<Category, 'id'>) => void;
-  updateCategory: (id: string, category: Partial<Category>) => void;
-  deleteCategory: (id: string) => void;
+  loading: boolean;
+  addProduct: (product: Omit<Product, 'id' | 'created_at'>) => Promise<void>;
+  updateProduct: (id: string, product: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
+  addCategory: (category: Omit<Category, 'id'>) => Promise<void>;
+  updateCategory: (id: string, category: Partial<Category>) => Promise<void>;
+  deleteCategory: (id: string) => Promise<void>;
   getProductById: (id: string) => Product | undefined;
   getCategoryById: (id: string) => Category | undefined;
-  addPackage: (pkg: Omit<Package, 'id' | 'created_at' | 'updated_at'>) => void;
-  updatePackage: (id: string, pkg: Partial<Package>) => void;
-  deletePackage: (id: string) => void;
+  addPackage: (pkg: Omit<Package, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updatePackage: (id: string, pkg: Partial<Package>) => Promise<void>;
+  deletePackage: (id: string) => Promise<void>;
   getPackageById: (id: string) => Package | undefined;
   getPackageByTrackingId: (trackingId: string) => Package | undefined;
 }
 
+// Map backend camelCase response to frontend snake_case
+const mapProduct = (p: any): Product => ({
+  id: p.id,
+  name: p.name,
+  description: p.description,
+  price_estimate: p.price ?? p.price_estimate,
+  category_id: p.categoryId ?? p.category_id,
+  image_url: p.image ?? p.image_url,
+  is_featured: p.isFeatured === 1 || p.isFeatured === true || p.is_featured === true,
+  created_at: p.createdAt ?? p.created_at ?? new Date().toISOString(),
+  status: p.status ?? 'in_stock',
+  estimated_delivery: p.estimatedDelivery ?? p.estimated_delivery,
+});
+
+const mapCategory = (c: any): Category => ({
+  id: c.id,
+  name: c.name,
+  slug: c.slug ?? c.name.toLowerCase().replace(/\s+/g, '-'),
+});
+
+const mapPackage = (p: any): Package => ({
+  id: p.id,
+  tracking_id: p.trackingId ?? p.tracking_id,
+  status: p.status,
+  shipping_route: (p.shippingRoute ?? p.shipping_route ?? 'sea') as 'sea' | 'air',
+  current_location: p.currentLocation ?? p.current_location ?? '',
+  origin: p.origin ?? '',
+  destination: p.destination ?? '',
+  created_at: p.createdAt ?? p.created_at ?? new Date().toISOString(),
+  updated_at: p.updatedAt ?? p.updated_at ?? new Date().toISOString(),
+  estimated_delivery: p.estimatedDelivery ?? p.estimated_delivery,
+});
+
 const DataContext = createContext<DataContextType | undefined>(undefined);
-
-const initialProducts: Product[] = [
-  {
-    id: '1',
-    name: 'Premium Wireless Headphones',
-    description: 'High-quality wireless headphones with noise cancellation and long battery life. Perfect for music lovers and professionals.',
-    price_estimate: 45,
-    category_id: '1',
-    image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop',
-    is_featured: true,
-    created_at: new Date().toISOString(),
-    status: 'preorder',
-    estimated_delivery: '15-20 days'
-  },
-  {
-    id: '2',
-    name: 'Smart Watch Pro',
-    description: 'Advanced smartwatch with fitness tracking, heart rate monitor, and smartphone integration.',
-    price_estimate: 120,
-    category_id: '1',
-    image_url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop',
-    is_featured: true,
-    created_at: new Date().toISOString(),
-    status: 'preorder',
-    estimated_delivery: '10-15 days'
-  },
-  {
-    id: '3',
-    name: 'USB-C Hub Adapter',
-    description: 'Multi-port USB-C hub with HDMI, USB 3.0, and SD card reader. Ultra-compact design.',
-    price_estimate: 25,
-    category_id: '2',
-    image_url: 'https://images.unsplash.com/photo-1625948515291-69613efd103f?w=500&h=500&fit=crop',
-    is_featured: false,
-    created_at: new Date().toISOString(),
-    status: 'in_stock',
-    estimated_delivery: '5-7 days'
-  },
-  {
-    id: '4',
-    name: 'Portable Phone Charger',
-    description: '20000mAh portable power bank with fast charging support for multiple devices.',
-    price_estimate: 18,
-    category_id: '2',
-    image_url: 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=500&h=500&fit=crop',
-    is_featured: true,
-    created_at: new Date().toISOString(),
-    status: 'preorder',
-    estimated_delivery: '12-18 days'
-  },
-  {
-    id: '5',
-    name: 'Phone Screen Protector',
-    description: 'Tempered glass screen protector with 9H hardness and anti-fingerprint coating.',
-    price_estimate: 5,
-    category_id: '3',
-    image_url: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&h=500&fit=crop',
-    is_featured: false,
-    created_at: new Date().toISOString(),
-    status: 'in_stock',
-    estimated_delivery: '7-10 days'
-  },
-  {
-    id: '6',
-    name: 'Protective Phone Case',
-    description: 'Durable silicone phone case with shock absorption and premium finish.',
-    price_estimate: 12,
-    category_id: '3',
-    image_url: 'https://images.unsplash.com/photo-1592286927505-1def25115558?w=500&h=500&fit=crop',
-    is_featured: false,
-    created_at: new Date().toISOString(),
-    status: 'in_stock',
-    estimated_delivery: '5-7 days'
-  }
-];
-
-const initialCategories: Category[] = [
-  { id: '1', name: 'Electronics', slug: 'electronics' },
-  { id: '2', name: 'Accessories', slug: 'accessories' },
-  { id: '3', name: 'Phone Protection', slug: 'phone-protection' }
-];
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [packages, setPackages] = useState<Package[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Load data from localStorage on mount
+  // Fetch all data from the API on mount
   useEffect(() => {
-    const savedProducts = localStorage.getItem('products');
-    const savedCategories = localStorage.getItem('categories');
-    const savedPackages = localStorage.getItem('packages');
-
-    if (savedProducts) {
-      setProducts(JSON.parse(savedProducts));
-    } else {
-      setProducts(initialProducts);
-      localStorage.setItem('products', JSON.stringify(initialProducts));
-    }
-
-    if (savedCategories) {
-      setCategories(JSON.parse(savedCategories));
-    } else {
-      setCategories(initialCategories);
-      localStorage.setItem('categories', JSON.stringify(initialCategories));
-    }
-
-    if (savedPackages) {
-      setPackages(JSON.parse(savedPackages));
-    }
-  }, []);
-
-  // Save products to localStorage whenever they change
-  useEffect(() => {
-    if (products.length > 0) {
-      localStorage.setItem('products', JSON.stringify(products));
-    }
-  }, [products]);
-
-  // Save categories to localStorage whenever they change
-  useEffect(() => {
-    if (categories.length > 0) {
-      localStorage.setItem('categories', JSON.stringify(categories));
-    }
-  }, [categories]);
-
-  // Save packages to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('packages', JSON.stringify(packages));
-  }, [packages]);
-
-  const addProduct = useCallback((product: Omit<Product, 'id' | 'created_at'>) => {
-    const newProduct: Product = {
-      ...product,
-      id: Date.now().toString(),
-      created_at: new Date().toISOString(),
+    const fetchAll = async () => {
+      try {
+        const [prods, cats, pkgs] = await Promise.all([
+          productsAPI.getAll(),
+          categoriesAPI.getAll(),
+          packagesAPI.getAll(),
+        ]);
+        setProducts((prods || []).map(mapProduct));
+        setCategories((cats || []).map(mapCategory));
+        setPackages((pkgs || []).map(mapPackage));
+      } catch (err) {
+        console.error('Failed to load data from API:', err);
+      } finally {
+        setLoading(false);
+      }
     };
-    setProducts((prev) => [newProduct, ...prev]);
+    fetchAll();
   }, []);
 
-  const updateProduct = useCallback((id: string, updatedProduct: Partial<Product>) => {
+  const addProduct = useCallback(async (product: Omit<Product, 'id' | 'created_at'>) => {
+    const data = await productsAPI.create({
+      name: product.name,
+      description: product.description,
+      price: product.price_estimate,
+      categoryId: product.category_id,
+      image: product.image_url,
+      isFeatured: product.is_featured,
+      status: product.status,
+      estimatedDelivery: product.estimated_delivery,
+    });
+    setProducts((prev) => [mapProduct(data), ...prev]);
+  }, []);
+
+  const updateProduct = useCallback(async (id: string, updatedProduct: Partial<Product>) => {
+    const data = await productsAPI.update(id, {
+      name: updatedProduct.name,
+      description: updatedProduct.description,
+      price: updatedProduct.price_estimate,
+      categoryId: updatedProduct.category_id,
+      image: updatedProduct.image_url,
+      isFeatured: updatedProduct.is_featured,
+      status: updatedProduct.status,
+      estimatedDelivery: updatedProduct.estimated_delivery,
+    });
     setProducts((prev) =>
-      prev.map((product) =>
-        product.id === id ? { ...product, ...updatedProduct } : product
-      )
+      prev.map((p) => (p.id === id ? { ...p, ...mapProduct({ ...p, ...data }) } : p))
     );
   }, []);
 
-  const deleteProduct = useCallback((id: string) => {
-    setProducts((prev) => prev.filter((product) => product.id !== id));
+  const deleteProduct = useCallback(async (id: string) => {
+    await productsAPI.delete(id);
+    setProducts((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
-  const addCategory = useCallback((category: Omit<Category, 'id'>) => {
-    const newCategory: Category = {
-      ...category,
-      id: Date.now().toString(),
-    };
-    setCategories((prev) => [newCategory, ...prev]);
+  const addCategory = useCallback(async (category: Omit<Category, 'id'>) => {
+    const data = await categoriesAPI.create({ name: category.name, slug: category.slug });
+    setCategories((prev) => [mapCategory(data), ...prev]);
   }, []);
 
-  const updateCategory = useCallback((id: string, updatedCategory: Partial<Category>) => {
+  const updateCategory = useCallback(async (id: string, updatedCategory: Partial<Category>) => {
+    const data = await categoriesAPI.update(id, { name: updatedCategory.name, slug: updatedCategory.slug });
     setCategories((prev) =>
-      prev.map((category) =>
-        category.id === id ? { ...category, ...updatedCategory } : category
-      )
+      prev.map((c) => (c.id === id ? { ...c, ...mapCategory({ ...c, ...data }) } : c))
     );
   }, []);
 
-  const deleteCategory = useCallback((id: string) => {
-    setCategories((prev) => prev.filter((category) => category.id !== id));
+  const deleteCategory = useCallback(async (id: string) => {
+    await categoriesAPI.delete(id);
+    setCategories((prev) => prev.filter((c) => c.id !== id));
   }, []);
 
   const getProductById = useCallback(
-    (id: string) => products.find((product) => product.id === id),
+    (id: string) => products.find((p) => p.id === id),
     [products]
   );
 
   const getCategoryById = useCallback(
-    (id: string) => categories.find((category) => category.id === id),
+    (id: string) => categories.find((c) => c.id === id),
     [categories]
   );
 
-  const addPackage = useCallback((pkg: Omit<Package, 'id' | 'created_at' | 'updated_at'>) => {
-    const now = new Date().toISOString();
-    const newPackage: Package = {
-      ...pkg,
-      id: Date.now().toString(),
-      created_at: now,
-      updated_at: now,
-    };
-    setPackages((prev) => [newPackage, ...prev]);
+  const addPackage = useCallback(async (pkg: Omit<Package, 'id' | 'created_at' | 'updated_at'>) => {
+    const data = await packagesAPI.create({
+      trackingId: pkg.tracking_id,
+      status: pkg.status,
+      shippingRoute: pkg.shipping_route,
+      origin: pkg.origin,
+      destination: pkg.destination,
+      currentLocation: pkg.current_location,
+      estimatedDelivery: pkg.estimated_delivery,
+    });
+    setPackages((prev) => [mapPackage(data), ...prev]);
   }, []);
 
-  const updatePackage = useCallback((id: string, updatedPackage: Partial<Package>) => {
+  const updatePackage = useCallback(async (id: string, updatedPackage: Partial<Package>) => {
+    const data = await packagesAPI.update(id, {
+      status: updatedPackage.status,
+      shippingRoute: updatedPackage.shipping_route,
+      currentLocation: updatedPackage.current_location,
+      estimatedDelivery: updatedPackage.estimated_delivery,
+    });
     setPackages((prev) =>
-      prev.map((pkg) =>
-        pkg.id === id ? { ...pkg, ...updatedPackage, updated_at: new Date().toISOString() } : pkg
-      )
+      prev.map((p) => (p.id === id ? { ...p, ...mapPackage({ ...p, ...data }) } : p))
     );
   }, []);
 
-  const deletePackage = useCallback((id: string) => {
-    setPackages((prev) => prev.filter((pkg) => pkg.id !== id));
+  const deletePackage = useCallback(async (id: string) => {
+    await packagesAPI.delete(id);
+    setPackages((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
   const getPackageById = useCallback(
-    (id: string) => packages.find((pkg) => pkg.id === id),
+    (id: string) => packages.find((p) => p.id === id),
     [packages]
   );
 
   const getPackageByTrackingId = useCallback(
-    (trackingId: string) => packages.find((pkg) => pkg.tracking_id.toUpperCase() === trackingId.toUpperCase()),
+    (trackingId: string) =>
+      packages.find((p) => p.tracking_id.toUpperCase() === trackingId.toUpperCase()),
     [packages]
   );
 
@@ -271,6 +222,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     products,
     categories,
     packages,
+    loading,
     addProduct,
     updateProduct,
     deleteProduct,
