@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useData } from '../context/DataContext';
@@ -26,6 +26,30 @@ const AdminProductForm: React.FC = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    try {
+      const data = new FormData();
+      data.append('file', file);
+      data.append('upload_preset', 'mo7istw9');
+      const res = await fetch('https://api.cloudinary.com/v1_1/dqpy0ddog/image/upload', {
+        method: 'POST',
+        body: data,
+      });
+      const json = await res.json();
+      setFormData(prev => ({ ...prev, image_url: json.secure_url }));
+    } catch (err) {
+      addToast('Image upload failed', 'error');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -170,15 +194,32 @@ const AdminProductForm: React.FC = () => {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="image_url">Image URL *</label>
+              <label htmlFor="image_url">Product Image *</label>
+              {/* Upload from device */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleImageUpload}
+              />
+              <button
+                type="button"
+                className="btn btn-outline"
+                style={{ marginBottom: '0.5rem', width: '100%' }}
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+              >
+                {isUploading ? '⏳ Uploading...' : '📁 Upload Image from Device'}
+              </button>
+              {/* Or paste URL manually */}
               <input
                 type="url"
                 id="image_url"
                 name="image_url"
                 value={formData.image_url}
                 onChange={handleInputChange}
-                placeholder="https://example.com/image.jpg"
-                required
+                placeholder="Or paste an image URL..."
               />
               {formData.image_url && (
                 <div style={{ marginTop: '1rem' }}>
@@ -187,10 +228,13 @@ const AdminProductForm: React.FC = () => {
                     src={formData.image_url}
                     alt="Product"
                     style={{
-                      maxWidth: '200px',
+                      width: '100%',
+                      maxWidth: '400px',
                       height: 'auto',
+                      objectFit: 'contain',
                       borderRadius: '8px',
-                      marginTop: '0.5rem'
+                      marginTop: '0.5rem',
+                      display: 'block'
                     }}
                   />
                 </div>
