@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { getAdminEmail } from '../utils/helpers';
 
 interface AuthContextType {
@@ -10,15 +10,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('adminAuth') === 'true';
+  });
 
-  // Load auth state from localStorage on mount
-  useEffect(() => {
-    const savedAuth = localStorage.getItem('adminAuth');
-    if (savedAuth) {
-      setIsAuthenticated(JSON.parse(savedAuth));
-    }
-  }, []);
+  // no useEffect needed — state is initialized synchronously above
 
   const login = (email: string, password: string) => {
     // Mock authentication - in production, verify against backend
