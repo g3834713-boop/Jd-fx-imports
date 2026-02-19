@@ -158,14 +158,28 @@ const Home: React.FC = () => {
           <div className="grid grid-4">
             <div className="testimonial-card">
               <div className="testimonial-header">
-                <div className="avatar">👩‍💼</div>
+                <div className="avatar">�‍💼</div>
                 <div>
-                  <h4>Sarah Johnson</h4>
-                  <p className="location">United States</p>
+                  <h4>Kwame Mensah</h4>
+                  <p className="location">🇬🇭 Accra, Ghana</p>
                 </div>
               </div>
               <p className="testimonial-text">
-                Amazing service! The products arrived in perfect condition and the support team was super responsive on WhatsApp.
+                Ordered a phone and some accessories — everything arrived well packaged and on time. The WhatsApp updates made the whole process stress-free. Jordan Imports is the real deal!
+              </p>
+              <div className="stars">⭐⭐⭐⭐⭐</div>
+            </div>
+
+            <div className="testimonial-card">
+              <div className="testimonial-header">
+                <div className="avatar">👩‍🦱</div>
+                <div>
+                  <h4>Abena Osei</h4>
+                  <p className="location">🇬🇭 Kumasi, Ghana</p>
+                </div>
+              </div>
+              <p className="testimonial-text">
+                I was skeptical at first but they delivered exactly what I ordered. The prices are unbeatable compared to buying locally. I've already referred three friends!
               </p>
               <div className="stars">⭐⭐⭐⭐⭐</div>
             </div>
@@ -174,40 +188,26 @@ const Home: React.FC = () => {
               <div className="testimonial-header">
                 <div className="avatar">👨‍💻</div>
                 <div>
-                  <h4>Ahmed Hassan</h4>
-                  <p className="location">Egypt</p>
+                  <h4>Emeka Okafor</h4>
+                  <p className="location">🇳🇬 Lagos, Nigeria</p>
                 </div>
               </div>
               <p className="testimonial-text">
-                Best prices I found online. The process was transparent and shipping was faster than expected. Highly recommended!
+                Fast shipping and great customer service on WhatsApp. Got my order within the estimated time and everything was exactly as described. Will definitely order again!
               </p>
               <div className="stars">⭐⭐⭐⭐⭐</div>
             </div>
 
             <div className="testimonial-card">
               <div className="testimonial-header">
-                <div className="avatar">👩‍🔬</div>
+                <div className="avatar">👩‍🎓</div>
                 <div>
-                  <h4>Maria Garcia</h4>
-                  <p className="location">Spain</p>
+                  <h4>Chidinma Eze</h4>
+                  <p className="location">🇳🇬 Abuja, Nigeria</p>
                 </div>
               </div>
               <p className="testimonial-text">
-                Great variety of products and fair pricing. The team went above and beyond to help with my custom order.
-              </p>
-              <div className="stars">⭐⭐⭐⭐⭐</div>
-            </div>
-
-            <div className="testimonial-card">
-              <div className="testimonial-header">
-                <div className="avatar">👨‍🏫</div>
-                <div>
-                  <h4>Kwame Mensah</h4>
-                  <p className="location">Ghana</p>
-                </div>
-              </div>
-              <p className="testimonial-text">
-                Exactly what I needed! Quick delivery to Ghana, great prices, and the WhatsApp support was incredibly helpful. Will definitely order again!
+                The custom order feature is amazing — I told them exactly what I needed and they sourced it for me. Quality products, fair prices, and they keep you updated every step of the way.
               </p>
               <div className="stars">⭐⭐⭐⭐⭐</div>
             </div>
