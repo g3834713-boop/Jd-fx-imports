@@ -48,7 +48,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         );
       }
 
-      return [...prevCart, { ...product, quantity: product.quantity || 1 }];
+      return [...prevCart, {
+        ...product,
+        price: product.price ?? product.price_estimate ?? 0,
+        quantity: product.quantity || 1
+      }];
     });
   }, []);
 
