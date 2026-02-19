@@ -16,10 +16,12 @@ const Shop: React.FC = () => {
     return products.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = !selectedCategory || product.category_id === selectedCategory;
+      const matchesCategory = !selectedCategory ||
+        product.category_id === selectedCategory ||
+        categories.find(c => c.slug === selectedCategory)?.id === product.category_id;
       return matchesSearch && matchesCategory;
     });
-  }, [products, searchTerm, selectedCategory]);
+  }, [products, categories, searchTerm, selectedCategory]);
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const paginatedProducts = filteredProducts.slice(
