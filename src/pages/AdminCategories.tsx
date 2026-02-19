@@ -13,6 +13,7 @@ const AdminCategories: React.FC = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: '', slug: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddNew = () => {
     setIsAddingNew(true);
@@ -33,6 +34,7 @@ const AdminCategories: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
     if (!formData.name.trim()) {
       addToast('Category name is required', 'error');
@@ -44,6 +46,7 @@ const AdminCategories: React.FC = () => {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       if (editingId) {
         await updateCategory(editingId, formData);
@@ -57,6 +60,8 @@ const AdminCategories: React.FC = () => {
       setFormData({ name: '', slug: '' });
     } catch (error) {
       addToast('An error occurred', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -130,10 +135,10 @@ const AdminCategories: React.FC = () => {
             </div>
 
             <div className="form-actions">
-              <button type="submit" className="btn btn-primary">
-                {editingId ? '💾 Update Category' : '➕ Add Category'}
+              <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : editingId ? '💾 Update Category' : '➕ Add Category'}
               </button>
-              <button type="button" onClick={handleCancel} className="btn btn-outline">
+              <button type="button" onClick={handleCancel} className="btn btn-outline" disabled={isSubmitting}>
                 Cancel
               </button>
             </div>

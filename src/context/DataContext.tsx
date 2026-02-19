@@ -98,14 +98,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [prods, cats, pkgs] = await Promise.all([
+        const [prodsResult, catsResult, pkgsResult] = await Promise.allSettled([
           productsAPI.getAll(),
           categoriesAPI.getAll(),
           packagesAPI.getAll(),
         ]);
-        setProducts((prods || []).map(mapProduct));
-        setCategories((cats || []).map(mapCategory));
-        setPackages((pkgs || []).map(mapPackage));
+        if (prodsResult.status === 'fulfilled') setProducts((prodsResult.value || []).map(mapProduct));
+        if (catsResult.status === 'fulfilled') setCategories((catsResult.value || []).map(mapCategory));
+        if (pkgsResult.status === 'fulfilled') setPackages((pkgsResult.value || []).map(mapPackage));
       } catch (err) {
         console.error('Failed to load data from API:', err);
       } finally {
