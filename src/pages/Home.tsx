@@ -102,7 +102,7 @@ const Home: React.FC = () => {
       <section className="categories-preview">
         <div className="container">
           <h2>Shop by Category</h2>
-          <div className="grid grid-3">
+          <div className="grid grid-4">
             {categories.map((category) => (
               <Link
                 key={category.id}
