@@ -26,6 +26,21 @@ const AdminProducts: React.FC = () => {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (products.length === 0) {
+      addToast('No products to delete', 'error');
+      return;
+    }
+    if (window.confirm(`Delete ALL ${products.length} product(s)? This action cannot be undone.`)) {
+      try {
+        await Promise.all(products.map((p) => deleteProduct(p.id)));
+        addToast('All products deleted successfully', 'success');
+      } catch (error) {
+        addToast('Failed to delete all products', 'error');
+      }
+    }
+  };
+
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
@@ -54,6 +69,9 @@ const AdminProducts: React.FC = () => {
         <Link to="/admin/products/new" className="btn btn-primary">
           ➕ Add New Product
         </Link>
+        <button onClick={handleDeleteAll} className="btn btn-danger">
+          🗑️ Delete All Products
+        </button>
       </div>
 
       <div className="admin-table">
