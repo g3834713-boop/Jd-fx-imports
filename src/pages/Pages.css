@@ -380,10 +380,16 @@ section h2 {
   border-color: var(--primary-color);
 }
 
+@keyframes grid-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .products-grid {
   display: grid;
   gap: 2rem;
   margin-bottom: 2rem;
+  animation: grid-fade-in 0.25s ease;
 }
 
 .no-products {

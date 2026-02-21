@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import ProductCard from '../components/common/ProductCard';
@@ -12,8 +12,10 @@ const Shop: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
+  const shuffleCacheRef = useRef<{ key: string; items: typeof products }>({ key: '', items: [] });
+
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
+    const filtered = products.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = !selectedCategory ||
@@ -21,6 +23,21 @@ const Shop: React.FC = () => {
         categories.find(c => c.slug === selectedCategory)?.id === product.category_id;
       return matchesSearch && matchesCategory;
     });
+
+    if (!selectedCategory) {
+      const key = filtered.map(p => p.id).join(',');
+      if (key !== shuffleCacheRef.current.key) {
+        const shuffled = [...filtered];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        shuffleCacheRef.current = { key, items: shuffled };
+      }
+      return shuffleCacheRef.current.items;
+    }
+
+    return filtered;
   }, [products, categories, searchTerm, selectedCategory]);
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -81,7 +98,7 @@ const Shop: React.FC = () => {
         {/* Products Grid */}
         {paginatedProducts.length > 0 ? (
           <>
-            <div className="grid grid-3 products-grid">
+            <div key={currentPage} className="grid grid-3 products-grid">
               {paginatedProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
