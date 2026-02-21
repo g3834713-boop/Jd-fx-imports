@@ -19,10 +19,10 @@ export const generateOrderMessage = (items: any[], brandName: string): string =>
   let message = `Hi ${brandName}, I would like to order:\n\n`;
   
   items.forEach((item) => {
-    message += `${item.name} x${item.quantity} - $${item.price * item.quantity}\n`;
+    message += `${item.name} x${item.quantity} - ₵${item.price * item.quantity}\n`;
   });
 
-  message += `\nTotal: $${items.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}\n\nPlease confirm final price and shipping cost to my country.`;
+  message += `\nTotal: ₵${items.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}\n\nPlease confirm final price and shipping cost to my country.`;
   
   return message;
 };
@@ -56,8 +56,8 @@ export const generateCustomOrderMessage = (formData: any, brandName: string): st
  * @param currency - Currency code (default: USD)
  * @returns Formatted currency string
  */
-export const formatCurrency = (amount: number, currency: string = 'USD'): string => {
-  const formatter = new Intl.NumberFormat('en-US', {
+export const formatCurrency = (amount: number, currency: string = 'GHS'): string => {
+  const formatter = new Intl.NumberFormat('en-GH', {
     style: 'currency',
     currency: currency,
   });

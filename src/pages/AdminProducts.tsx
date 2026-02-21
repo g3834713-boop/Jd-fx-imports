@@ -77,7 +77,7 @@ const AdminProducts: React.FC = () => {
                     <td>
                       {categories.find((c) => c.id === product.category_id)?.name || 'N/A'}
                     </td>
-                    <td>${product.price_estimate.toFixed(2)}</td>
+                    <td>₵{product.price_estimate.toFixed(2)}</td>
                     <td>
                       <span style={{
                         padding: '0.25rem 0.75rem',
