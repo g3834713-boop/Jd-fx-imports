@@ -768,6 +768,10 @@ section h2 {
     grid-template-columns: 1fr;
   }
 
+  .products-grid {
+    gap: 0.75rem;
+  }
+
   .product-meta {
     flex-direction: column;
     gap: 1rem;
@@ -889,6 +893,10 @@ section h2 {
 }
 
 @media (max-width: 480px) {
+  .products-grid {
+    gap: 0.5rem;
+  }
+
   .hero-title {
     font-size: 1.5rem;
   }
@@ -904,10 +912,6 @@ section h2 {
 
   .how-it-works .grid-4 {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-
-  .products-grid {
     gap: 0.75rem;
   }
 

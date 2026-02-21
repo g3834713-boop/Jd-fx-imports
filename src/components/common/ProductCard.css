@@ -179,21 +179,21 @@
 
 @media (max-width: 768px) {
   .product-image-container {
-    padding-top: 130%;
+    padding-top: 100%;
   }
 
   .product-info {
-    padding: 0.6rem 0.75rem;
-    gap: 0.3rem;
+    padding: 0.5rem 0.6rem;
+    gap: 0.25rem;
   }
 
   .product-name {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     line-height: 1.2;
   }
 
   .product-description {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -201,22 +201,23 @@
   }
 
   .product-price {
-    font-size: 0.95rem;
+    font-size: 0.88rem;
   }
 
   .product-delivery {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
   }
 
   .product-footer {
-    padding-top: 0.5rem;
-    gap: 0.5rem;
+    padding-top: 0.4rem;
+    gap: 0.35rem;
+    flex-wrap: wrap;
   }
 
   .featured-badge,
   .status-badge {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.6rem;
   }
 
   .product-overlay .btn {

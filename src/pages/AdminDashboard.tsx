@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { formatCurrency } from '../utils/helpers';
@@ -6,8 +6,18 @@ import '../components/admin/Admin.css';
 
 const AdminDashboard: React.FC = () => {
   const { products, categories } = useData();
-  const recentProducts = products.slice(0, 5);
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+
   const totalValue = products.reduce((sum, p) => sum + (p.price_estimate * (p.stock ?? 0)), 0);
+
+  const isFiltering = minPrice !== '' || maxPrice !== '';
+  const filteredProducts = products.filter((p) => {
+    if (minPrice !== '' && p.price_estimate < parseFloat(minPrice)) return false;
+    if (maxPrice !== '' && p.price_estimate > parseFloat(maxPrice)) return false;
+    return true;
+  });
+  const displayedProducts = isFiltering ? filteredProducts : products.slice(0, 5);
 
   return (
     <div className="admin-dashboard">
@@ -44,10 +54,30 @@ const AdminDashboard: React.FC = () => {
       {/* Recent Products */}
       <div className="admin-table">
         <div className="admin-table-header">
-          <h2 style={{ margin: 0 }}>Recent Products</h2>
-          <Link to="/admin/products" className="btn btn-primary btn-sm">
-            View All
-          </Link>
+          <h2 style={{ margin: 0 }}>
+            {isFiltering ? `Filtered Products (${filteredProducts.length})` : 'Recent Products'}
+          </h2>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <input
+              type="number"
+              placeholder="Min price"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              style={{ width: '110px', padding: '0.4rem 0.6rem', border: '2px solid var(--border-color)', borderRadius: '8px', fontSize: '0.9rem' }}
+            />
+            <span style={{ color: 'var(--text-light)' }}>–</span>
+            <input
+              type="number"
+              placeholder="Max price"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              style={{ width: '110px', padding: '0.4rem 0.6rem', border: '2px solid var(--border-color)', borderRadius: '8px', fontSize: '0.9rem' }}
+            />
+            {isFiltering && (
+              <button onClick={() => { setMinPrice(''); setMaxPrice(''); }} className="btn btn-outline btn-sm">Clear</button>
+            )}
+            <Link to="/admin/products" className="btn btn-primary btn-sm">View All</Link>
+          </div>
         </div>
 
         <div className="table-wrapper">
@@ -63,8 +93,8 @@ const AdminDashboard: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {recentProducts.length > 0 ? (
-                recentProducts.map((product) => (
+              {displayedProducts.length > 0 ? (
+                displayedProducts.map((product) => (
                   <tr key={product.id}>
                     <td>{product.name}</td>
                     <td>
@@ -96,7 +126,7 @@ const AdminDashboard: React.FC = () => {
               ) : (
                 <tr>
                   <td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-light)' }}>
-                    No products yet. <Link to="/admin/products/new">Create one</Link>
+                    {isFiltering ? 'No products match the selected price range' : <>No products yet. <Link to="/admin/products/new">Create one</Link></>}
                   </td>
                 </tr>
               )}
