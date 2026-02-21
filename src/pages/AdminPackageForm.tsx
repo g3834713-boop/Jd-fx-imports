@@ -21,7 +21,7 @@ const AdminPackageForm: React.FC = () => {
     current_location: 'China',
     origin: 'China',
     destination: 'Ghana',
-    estimated_delivery: '',
+    estimated_delivery: '45-50 days',
   });
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const AdminPackageForm: React.FC = () => {
         current_location: existingPackage.current_location,
         origin: existingPackage.origin,
         destination: existingPackage.destination,
-        estimated_delivery: existingPackage.estimated_delivery || '',
+        estimated_delivery: existingPackage.estimated_delivery || '45-50 days',
       });
     }
   }, [existingPackage]);
@@ -284,7 +284,7 @@ const AdminPackageForm: React.FC = () => {
             name="estimated_delivery"
             value={formData.estimated_delivery}
             onChange={handleChange}
-            placeholder="e.g., 15-20 days or March 15, 2026"
+            placeholder="e.g., 45-50 days or March 15, 2026"
             style={{
               width: '100%',
               padding: '0.75rem',

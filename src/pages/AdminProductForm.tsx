@@ -22,7 +22,7 @@ const AdminProductForm: React.FC = () => {
     image_url: product?.image_url || '',
     is_featured: product?.is_featured || false,
     status: product?.status || 'preorder',
-    estimated_delivery: product?.estimated_delivery || '15-20 days'
+    estimated_delivery: product?.estimated_delivery || '45-50 days'
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -249,7 +249,7 @@ const AdminProductForm: React.FC = () => {
                 name="estimated_delivery"
                 value={formData.estimated_delivery}
                 onChange={handleInputChange}
-                placeholder="e.g., 15-20 days"
+                placeholder="e.g., 45-50 days"
               />
             </div>
           </div>
