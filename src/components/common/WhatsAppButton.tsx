@@ -7,7 +7,7 @@ const WhatsAppButton: React.FC = () => {
   const phoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '1234567890';
 
   const handleClick = () => {
-    const message = `Hi {{BRAND_NAME}}, I would like to know more about your products!`;
+    const message = `Hi JORDAN IMPORTS, I would like to know more about your products!`;
     sendWhatsAppMessage(phoneNumber, message);
   };
 

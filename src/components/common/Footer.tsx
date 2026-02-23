@@ -47,6 +47,7 @@ const Footer: React.FC = () => {
             <h4>Contact</h4>
             <p>WhatsApp: Follow "Order on WhatsApp" button</p>
             <p>Email: {supportEmail}</p>
+            <p>Location: Takoradi Harbour Road, Ghana</p>
             <p>Response time: 24 hours</p>
           </div>
         </div>
