@@ -9,6 +9,7 @@ import Layout from './components/common/Layout';
 import WhatsAppButton from './components/common/WhatsAppButton';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminLayout from './components/admin/AdminLayout';
+import ScrollToTop from './components/common/ScrollToTop';
 
 // Pages
 import Home from './pages/Home';
@@ -34,6 +35,7 @@ function App() {
         <CartProvider>
           <ToastProvider>
             <Router>
+              <ScrollToTop />
               <WhatsAppButton />
               <Routes>
                 {/* Public Routes */}
