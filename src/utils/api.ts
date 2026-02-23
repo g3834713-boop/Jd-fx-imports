@@ -199,3 +199,25 @@ export const packagesAPI = {
 };
 
 export default api;
+
+// Settings API
+export const settingsAPI = {
+  getAll: async (): Promise<Record<string, string>> => {
+    try {
+      const response = await api.get('/settings');
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
+      return {};
+    }
+  },
+
+  update: async (key: string, value: string): Promise<void> => {
+    try {
+      await api.put(`/settings/${key}`, { value });
+    } catch (error) {
+      console.error(`Failed to update setting ${key}:`, error);
+      throw error;
+    }
+  },
+};

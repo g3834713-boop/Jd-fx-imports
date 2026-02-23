@@ -1,14 +1,15 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
 import { sendWhatsAppMessage } from '../../utils/helpers';
+import { useData } from '../../context/DataContext';
 import './WhatsAppButton.css';
 
 const WhatsAppButton: React.FC = () => {
-  const phoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '1234567890';
+  const { settings } = useData();
 
   const handleClick = () => {
-    const message = `Hi JORDAN IMPORTS, I would like to know more about your products!`;
-    sendWhatsAppMessage(phoneNumber, message);
+    const message = `Hi ${settings.brandName}, I would like to know more about your products!`;
+    sendWhatsAppMessage(settings.whatsappNumber, message);
   };
 
   return (

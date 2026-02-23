@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { productsAPI, categoriesAPI, packagesAPI } from '../utils/api';
+import { productsAPI, categoriesAPI, packagesAPI, settingsAPI } from '../utils/api';
 
 export interface Product {
   id: string;
@@ -21,6 +21,11 @@ export interface Category {
   slug: string;
 }
 
+export interface AppSettings {
+  whatsappNumber: string;
+  brandName: string;
+}
+
 export interface Package {
   id: string;
   tracking_id: string;
@@ -38,7 +43,9 @@ interface DataContextType {
   products: Product[];
   categories: Category[];
   packages: Package[];
+  settings: AppSettings;
   loading: boolean;
+  updateSetting: (key: string, value: string) => Promise<void>;
   addProduct: (product: Omit<Product, 'id' | 'created_at'>) => Promise<void>;
   updateProduct: (id: string, product: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
@@ -94,20 +101,32 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [packages, setPackages] = useState<Package[]>([]);
+  const [settings, setSettings] = useState<AppSettings>({
+    whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || '',
+    brandName: import.meta.env.VITE_BRAND_NAME || 'Jordan Imports',
+  });
   const [loading, setLoading] = useState(true);
 
   // Fetch all data from the API on mount
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [prodsResult, catsResult, pkgsResult] = await Promise.allSettled([
+        const [prodsResult, catsResult, pkgsResult, settingsResult] = await Promise.allSettled([
           productsAPI.getAll(),
           categoriesAPI.getAll(),
           packagesAPI.getAll(),
+          settingsAPI.getAll(),
         ]);
         if (prodsResult.status === 'fulfilled') setProducts((prodsResult.value || []).map(mapProduct));
         if (catsResult.status === 'fulfilled') setCategories((catsResult.value || []).map(mapCategory));
         if (pkgsResult.status === 'fulfilled') setPackages((pkgsResult.value || []).map(mapPackage));
+        if (settingsResult.status === 'fulfilled') {
+          const raw = settingsResult.value;
+          setSettings(prev => ({
+            whatsappNumber: raw.whatsapp_number || prev.whatsappNumber,
+            brandName: raw.brand_name || prev.brandName,
+          }));
+        }
       } catch (err) {
         console.error('Failed to load data from API:', err);
       } finally {
@@ -220,11 +239,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [packages]
   );
 
+  const updateSetting = useCallback(async (key: string, value: string) => {
+    await settingsAPI.update(key, value);
+    setSettings(prev => ({
+      ...prev,
+      ...(key === 'whatsapp_number' ? { whatsappNumber: value } : {}),
+      ...(key === 'brand_name' ? { brandName: value } : {}),
+    }));
+  }, []);
+
   const value: DataContextType = {
     products,
     categories,
     packages,
+    settings,
     loading,
+    updateSetting,
     addProduct,
     updateProduct,
     deleteProduct,

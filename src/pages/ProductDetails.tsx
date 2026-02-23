@@ -4,20 +4,20 @@ import { ArrowLeft, Share2 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../utils/Toast';
-import { sendWhatsAppMessage, formatCurrency, getBrandName } from '../utils/helpers';
+import { sendWhatsAppMessage, formatCurrency } from '../utils/helpers';
 import './Pages.css';
 
 const ProductDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getProductById } = useData();
+  const { getProductById, settings } = useData();
   const { addToCart } = useCart();
   const { addToast } = useToast();
   const [quantity, setQuantity] = useState(1);
 
   const product = getProductById(id || '');
-  const brandName = getBrandName();
-  const phoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '1234567890';
+  const brandName = settings.brandName;
+  const phoneNumber = settings.whatsappNumber;
 
   if (!product) {
     return (
@@ -43,7 +43,7 @@ const ProductDetails: React.FC = () => {
   };
 
   const handleWhatsAppOrder = () => {
-    const message = `Hi {{BRAND_NAME}}, I'm interested in:\n\n${product.name} x${quantity}\n\nPrice: ${formatCurrency(product.price_estimate * quantity)}\n\nPlease confirm final price and shipping cost to my country.`;
+    const message = `Hi ${brandName}, I'm interested in:\n\n${product.name} x${quantity}\n\nPrice: ${formatCurrency(product.price_estimate * quantity)}\n\nPlease confirm final price and shipping cost to my country.`;
     sendWhatsAppMessage(phoneNumber, message);
   };
 

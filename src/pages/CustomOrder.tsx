@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useToast } from '../utils/Toast';
-import { sendWhatsAppMessage, generateCustomOrderMessage, getBrandName } from '../utils/helpers';
+import { useData } from '../context/DataContext';
+import { sendWhatsAppMessage, generateCustomOrderMessage } from '../utils/helpers';
 import './Pages.css';
 
 const CustomOrder: React.FC = () => {
@@ -13,8 +14,7 @@ const CustomOrder: React.FC = () => {
   });
 
   const { addToast } = useToast();
-  const brandName = getBrandName();
-  const phoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '1234567890';
+  const { settings } = useData();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -49,8 +49,8 @@ const CustomOrder: React.FC = () => {
     }
 
     // Generate and send message
-    const message = generateCustomOrderMessage(formData, brandName);
-    sendWhatsAppMessage(phoneNumber, message);
+    const message = generateCustomOrderMessage(formData, settings.brandName);
+    sendWhatsAppMessage(settings.whatsappNumber, message);
 
     // Reset form
     setFormData({

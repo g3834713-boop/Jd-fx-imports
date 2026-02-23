@@ -2,15 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Trash2, ArrowLeft } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../utils/Toast';
-import { sendWhatsAppMessage, formatCurrency, generateOrderMessage, getBrandName } from '../utils/helpers';
+import { sendWhatsAppMessage, formatCurrency, generateOrderMessage } from '../utils/helpers';
 import './Pages.css';
 
 const Cart: React.FC = () => {
   const { cart, removeFromCart, updateQuantity, subtotal, clearCart } = useCart();
+  const { settings } = useData();
   const { addToast } = useToast();
-  const brandName = getBrandName();
-  const phoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '1234567890';
 
   const handleRemoveItem = (id: string, name: string) => {
     removeFromCart(id);
@@ -23,8 +23,8 @@ const Cart: React.FC = () => {
       return;
     }
 
-    const message = generateOrderMessage(cart, brandName);
-    sendWhatsAppMessage(phoneNumber, message);
+    const message = generateOrderMessage(cart, settings.brandName);
+    sendWhatsAppMessage(settings.whatsappNumber, message);
     clearCart();
     addToast('Order sent! Check WhatsApp for confirmation.', 'success');
   };
